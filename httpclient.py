@@ -15,7 +15,7 @@ def main ():
 
     print "sending a GET request to our http server"
     try:
-        conn.request ("GET", "/")
+        conn.request("GET", "?53-isNumberPrime")
     except:
         print "Exception thrown: ", sys.exc_info()[0]
         raise
