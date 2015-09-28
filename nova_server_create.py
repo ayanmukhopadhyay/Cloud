@@ -4,6 +4,7 @@ import sys
 import time
 from novaclient.v2 import client
 
+
 # Institution: Vanderbilt University
 # Code created for the CS4287-5287 course
 # Author: Aniruddha Gokhale
@@ -30,6 +31,15 @@ def get_nova_creds ():
     '''
     # d['tenant_id'] = os.environ['OS_TENANT_ID']
     return d
+
+def getFloatingIPByServerName(serverName):
+    servers = nova.servers.list()
+    for server in servers:
+        if server.name == serverName:
+            return str(server.addresses["internal network"][1]["addr"])
+    return None
+
+
 
 # main
 def main ():
@@ -95,17 +105,23 @@ def main ():
         # the restful API (it does not get updated dynamically in the
         # server object we have)
         server = nova.servers.find(name=serverName)
-    
-    # you should cycle through the floating ips and choose the one that is not
-    # taken by someone yet. For now we are hardcoding it
 
-    print "Adding floating IP"
-    try:
-        server.add_floating_ip (address="129.59.107.90")
-    except:
-        print "Exception thrown: ", sys.exc_info()[0]
-        server.delete ()
-        raise
+    #check if the created serve already has a floating ip or not
+    ip = getFloatingIPByServerName(serverName)
+    if ip==None:
+        print "Adding floating IP"
+        try:
+            #check list of unassigned ips and add the first one
+            #get list of floating ips and check unassigned
+            floatingIPs = nova.floating_ips.list()
+            for ip in floatingIPs:
+                if ip._info["instance_id"] == None:
+                    server.add_floating_ip (address=ip._info["ip"])
+                    break
+        except:
+            print "Exception thrown: ", sys.exc_info()[0]
+            server.delete ()
+            raise
      
 # invoke main
 if __name__ == "__main__":
