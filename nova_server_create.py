@@ -18,16 +18,25 @@ def get_nova_creds ():
     # The rest of these are obtained from our environment. Don't forget
     # to do "source cloudclass-rc.sh"
     #
+    d['username'] = "mukhopa"
+    d['api_key'] = "ayan12345"
+    d['auth_url'] = "https://keystone.isis.vanderbilt.edu:5000/v2.0"
+    d['project_id'] = "Cloud Class"
+    '''
     d['username'] = os.environ['OS_USERNAME']
     d['api_key'] = os.environ['OS_PASSWORD']
     d['auth_url'] = os.environ['OS_AUTH_URL']
     d['project_id'] = os.environ['OS_TENANT_NAME']
+    '''
     # d['tenant_id'] = os.environ['OS_TENANT_ID']
     return d
 
 # main
 def main ():
-    
+
+    #set environment variables
+
+
     # get our credentials for version 2 of novaclient
     creds = get_nova_creds()
 
@@ -50,19 +59,30 @@ def main ():
     #netref = nova.networks.find (name="internal network")
     
     attrs = {
-        'name' : 'asg-ubuntu-test-vm',
+        'name' : 'ayan-ubuntu-test-vm',
         'image' : imageref,
         'flavor' : flavorref,
         # providing the ref this way for security group is not working
         #'security_groups' : sgref,
-        'key_name' : 'gokhale_horizonisis',
+        'key_name' : 'ayan_horizon',
         # I was going to do the following but does not work
         # 'nics' : [{'net-id' : netref.id}]
         'nics' : [{'net-id' : 'b16b0244-e1b5-4d36-90ff-83a0d87d8682'}]
         }
 
     try:
-        server = nova.servers.create (**attrs)
+        serverName = "ayan-ubuntu-test-vm"
+        serverList = nova.servers.list()
+        serverExists = False # to check if server already exists
+
+        for counterServers in range(len(serverList)):
+            if serverName == str(serverList[0]).split(":")[1].strip().split(">")[0]:
+                serverExists = True
+                server = serverList[counterServers]
+                break
+        if not serverExists:
+            server = nova.servers.create(**attrs)
+
     except:
         print "Exception thrown: ", sys.exc_info()[0]
         raise
@@ -74,14 +94,14 @@ def main ():
         # we need to retrieve the status of the server from
         # the restful API (it does not get updated dynamically in the
         # server object we have)
-        server = nova.servers.find (name='asg-ubuntu-test-vm')
+        server = nova.servers.find(name=serverName)
     
     # you should cycle through the floating ips and choose the one that is not
     # taken by someone yet. For now we are hardcoding it
 
     print "Adding floating IP"
     try:
-        server.add_floating_ip (address="129.59.107.96")
+        server.add_floating_ip (address="129.59.107.90")
     except:
         print "Exception thrown: ", sys.exc_info()[0]
         server.delete ()
