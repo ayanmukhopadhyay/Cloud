@@ -32,17 +32,19 @@ def get_nova_creds ():
     # d['tenant_id'] = os.environ['OS_TENANT_ID']
     return d
 
-def getFloatingIPByServerName(serverName):
+def getFloatingIPByServerName(nova,serverName):
     servers = nova.servers.list()
     for server in servers:
         if server.name == serverName:
-            return str(server.addresses["internal network"][1]["addr"])
-    return None
+            try:
+                return str(server.addresses["internal network"][1]["addr"])
+            except IndexError:
+                return None
 
 
 
 # main
-def main ():
+def setup ():
 
     #set environment variables
 
@@ -107,7 +109,8 @@ def main ():
         server = nova.servers.find(name=serverName)
 
     #check if the created serve already has a floating ip or not
-    ip = getFloatingIPByServerName(serverName)
+    ip = getFloatingIPByServerName(nova,serverName)
+    print ip
     if ip==None:
         print "Adding floating IP"
         try:
@@ -125,5 +128,7 @@ def main ():
      
 # invoke main
 if __name__ == "__main__":
-    sys.exit (main ())
+    setup()
+
+
     
