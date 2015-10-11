@@ -4,6 +4,7 @@ import sys
 import time
 from novaclient.v2 import client
 
+secondaryVMCounter = 0
 
 # Institution: Vanderbilt University
 # Code created for the CS4287-5287 course
@@ -44,7 +45,7 @@ def getFloatingIPByServerName(nova,serverName):
 
 
 # main
-def setup ():
+def setup (primary=True,counter=0):
 
     #set environment variables
 
@@ -69,9 +70,12 @@ def setup ():
     sgref = nova.security_groups.find (name="default")
     # for some reason, this is not working.
     #netref = nova.networks.find (name="internal network")
-    
+    if primary:
+        vmName = 'ayan-ubuntu-test-vm'
+    else:
+        vmName =  'ayan-ubuntu-test-vm' +str(counter)
     attrs = {
-        'name' : 'ayan-ubuntu-test-vm',
+        'name' : vmName,
         'image' : imageref,
         'flavor' : flavorref,
         # providing the ref this way for security group is not working
@@ -83,12 +87,13 @@ def setup ():
         }
 
     try:
-        serverName = "ayan-ubuntu-test-vm"
+        serverName = vmName
         serverList = nova.servers.list()
         serverExists = False # to check if server already exists
 
         for counterServers in range(len(serverList)):
-            if serverName == str(serverList[0]).split(":")[1].strip().split(">")[0]:
+            #print str(serverList[counterServers]).split(":")[1].strip().split(">")[0]
+            if serverName == str(serverList[counterServers]).split(":")[1].strip().split(">")[0]:
                 serverExists = True
                 server = serverList[counterServers]
                 break
@@ -108,27 +113,31 @@ def setup ():
         # server object we have)
         server = nova.servers.find(name=serverName)
 
-    #check if the created serve already has a floating ip or not
-    ip = getFloatingIPByServerName(nova,serverName)
-    print ip
-    if ip==None:
-        print "Adding floating IP"
-        try:
-            #check list of unassigned ips and add the first one
-            #get list of floating ips and check unassigned
-            floatingIPs = nova.floating_ips.list()
-            for ip in floatingIPs:
-                if ip._info["instance_id"] == None:
-                    server.add_floating_ip (address=ip._info["ip"])
-                    break
-        except:
-            print "Exception thrown: ", sys.exc_info()[0]
-            server.delete ()
-            raise
+    if primary==True:
+        #check if the created serve already has a floating ip or not
+        ip = getFloatingIPByServerName(nova,serverName)
+        print ip
+        if ip==None:
+            print "Adding floating IP"
+            try:
+                #check list of unassigned ips and add the first one
+                #get list of floating ips and check unassigned
+                floatingIPs = nova.floating_ips.list()
+                for ip in floatingIPs:
+                    if ip._info["instance_id"] == None:
+                        server.add_floating_ip (address=ip._info["ip"])
+                        break
+            except:
+                print "Exception thrown: ", sys.exc_info()[0]
+                server.delete ()
+                raise
      
 # invoke main
 if __name__ == "__main__":
-    setup()
+    setup()#setup primary vm
+    setup(primary=False,counter=1)#setup secondary vm
+    secondaryVMCounter+=1
+
 
 
     

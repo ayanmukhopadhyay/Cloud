@@ -7,6 +7,7 @@
 
 import sys
 import httplib
+from datetime import datetime
 
 def main ():
     print "Instantiating a connection obj"
@@ -18,7 +19,11 @@ def main ():
 
     print "sending a GET request to our http server"
     try:
+        timePre = datetime.now()
         conn.request("GET", "?53-isNumberPrime")
+        timePost = datetime.now()
+        latency = (timePost - timePre).total_seconds()
+        print latency
     except:
         print "Exception thrown: ", sys.exc_info()[0]
         raise
