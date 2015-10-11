@@ -7,6 +7,7 @@ from nova_server_create import setup
 HOST = ''
 PORT = 8080
 vmCounter=1
+latencyRecord=[]
 
 # MyHTTPHandler inherits from BaseHTTPServer.BaseHTTPRequestHandler
 class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
@@ -16,6 +17,16 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             if number%counter == 0:
                 return False
         return True
+
+    def spawnVM(self,counter):
+        setup(primary=False,counter=counter)
+
+    def workWithLatency(self,latency):
+        latencyRecord.append(latency)
+        if len(latencyRecord) > 2:
+            averageLatency=sum(latencyRecord[0:len(latencyRecord)-2])/float(len(len(latencyRecord)-2))#calculate average latency
+            if (latency-averageLatency)/float(averageLatency)*100 > 20:#check how much latency has risen in percentage
+                self.spawnVM(vmCounter+1)
 
 
     def do_GET (s):
@@ -29,16 +40,24 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         method = path.split('?')[1].split('-')[1]
         if method=="isNumberPrime":
             isPrime = s.isNumberPrime(number)
+            s.send_response (200)
+            s.send_header ("Content-type", "text/html")
+            s.end_headers ()
+            s.wfile.write ("<html><head><title>Title</title></head>")
+            s.wfile.write ("<body><p>This is a test.</p>")
+            s.wfile.write ("<p>Result is : %s</p>" % str(isPrime))
+            s.wfile.write ("</body.<html>")
         if method=="latencyReport":
             number = int(path.split('?')[1].split('-')[0])
+            s.send_response(200)
+            s.send_header ("Content-type", "text/html")
+            s.end_headers ()
+            s.wfile.write ("<html><head><title>Title</title></head>")
+            s.wfile.write ("<body><p>This is a test.</p>")
+            s.wfile.write ("</body.<html>")
 
-        s.send_response (200)
-        s.send_header ("Content-type", "text/html")
-        s.end_headers ()
-        s.wfile.write ("<html><head><title>Title</title></head>")
-        s.wfile.write ("<body><p>This is a test.</p>")
-        s.wfile.write ("<p>Result is : %s</p>" % str(isPrime))
-        s.wfile.write ("</body.<html>")
+            s.workWithLatency(number)
+
 
 
 if __name__ == '__main__':
