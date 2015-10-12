@@ -4,7 +4,7 @@ import sys
 import time
 from novaclient.v2 import client
 
-secondaryVMCounter = 0
+global secondaryVMCounter = 0
 
 # Institution: Vanderbilt University
 # Code created for the CS4287-5287 course
@@ -33,7 +33,16 @@ def get_nova_creds ():
     # d['tenant_id'] = os.environ['OS_TENANT_ID']
     return d
 
-def getFloatingIPByServerName(nova,serverName):
+def getFloatingIPByServerName(serverName):
+    # get our credentials for version 2 of novaclient
+    creds = get_nova_creds()
+
+    # Now access the connection from which everything else is obtained.
+    try:
+        nova = client.Client (**creds)
+    except:
+        print "Exception thrown: ", sys.exc_info()[0]
+        raise
     servers = nova.servers.list()
     for server in servers:
         if server.name == serverName:
@@ -42,13 +51,29 @@ def getFloatingIPByServerName(nova,serverName):
             except IndexError:
                 return None
 
+def getLocalIPByServerName(serverName):
+    # get our credentials for version 2 of novaclient
+    creds = get_nova_creds()
+
+    # Now access the connection from which everything else is obtained.
+    try:
+        nova = client.Client (**creds)
+    except:
+        print "Exception thrown: ", sys.exc_info()[0]
+        raise
+    servers = nova.servers.list()
+    for server in servers:
+        if server.name == serverName:
+            try:
+                return str(server.addresses["internal network"][0]["addr"])
+            except IndexError:
+                return None
 
 
 # main
-def setup (primary=True,counter=0):
+def setup (primary = True, counter):
 
     #set environment variables
-
 
     # get our credentials for version 2 of novaclient
     creds = get_nova_creds()
@@ -73,7 +98,7 @@ def setup (primary=True,counter=0):
     if primary:
         vmName = 'ayan-ubuntu-test-vm'
     else:
-        vmName =  'ayan-ubuntu-test-vm' +str(counter)
+        vmName =  'ayan-ubuntu-test-vm' + str(counter)
     attrs = {
         'name' : vmName,
         'image' : imageref,
@@ -84,7 +109,7 @@ def setup (primary=True,counter=0):
         # I was going to do the following but does not work
         # 'nics' : [{'net-id' : netref.id}]
         'nics' : [{'net-id' : 'b16b0244-e1b5-4d36-90ff-83a0d87d8682'}]
-        }
+    }
 
     try:
         serverName = vmName
@@ -113,11 +138,11 @@ def setup (primary=True,counter=0):
         # server object we have)
         server = nova.servers.find(name=serverName)
 
-    if primary==True:
+    if primary == True:
         #check if the created serve already has a floating ip or not
-        ip = getFloatingIPByServerName(nova,serverName)
+        ip = getFloatingIPByServerName(nova, serverName)
         print ip
-        if ip==None:
+        if ip == None:
             print "Adding floating IP"
             try:
                 #check list of unassigned ips and add the first one
@@ -131,13 +156,12 @@ def setup (primary=True,counter=0):
                 print "Exception thrown: ", sys.exc_info()[0]
                 server.delete ()
                 raise
-     
+
 # invoke main
 if __name__ == "__main__":
-    setup()#setup primary vm
-    setup(primary=False,counter=1)#setup secondary vm
-    secondaryVMCounter+=1
+    setup()					#setup primary vm
+    setup(primary = False, counter = 1)		#setup secondary vm
+    secondaryVMCounter += 1
 
 
 
-    
