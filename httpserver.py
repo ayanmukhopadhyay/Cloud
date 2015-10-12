@@ -104,10 +104,10 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             #set environment
             env.hosts = ["ubuntu@"+str(getLocalIPByServerName(vmName + str(vmCounter))),]
             print env.hosts
-            if _is_host_up(env.hosts[0],22):
-                execute(copy)
-            else:
-                print "host is not up"
+            while True:
+                if _is_host_up(env.hosts[0],22):
+                    execute(copy)
+
 
 
             # send the request to newly created local VM (also get the latency)
