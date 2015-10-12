@@ -82,7 +82,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
             # copy the file checkPrime.py in the local VM
             #set environment
-            env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
+            env.hosts = [str(getLocalIPByServerName(vmName + str(vmCounter))),]
             print env.hosts
             execute(copy)
 
