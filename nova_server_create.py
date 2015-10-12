@@ -158,10 +158,8 @@ def setup (primary = True, counter):
                 raise
 
 # invoke main
-if __name__ == "__main__":
-    setup()					#setup primary vm
-    setup(primary = False, counter = 1)		#setup secondary vm
-    secondaryVMCounter += 1
-
-
+# if __name__ == "__main__":
+#     setup()#setup primary vm
+#     setup(primary=False,counter=1)#setup secondary vm
+#     secondaryVMCounter+=1
 
