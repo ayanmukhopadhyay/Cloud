@@ -6,11 +6,30 @@ from nova_server_create import setup, getLocalIPByServerName
 
 from fabric.api import env, execute, task
 from fabric.operations import sudo, run, put
+from fabric.api import run, sudo, local, env
+import paramiko
+import socket
 
 HOST = ''
 PORT = 8080
 vmName = 'ayan-ubuntu-test-vm'
 vmCounter = 1234
+
+def _is_host_up(host, port):
+    # Set the timeout
+    original_timeout = socket.getdefaulttimeout()
+    new_timeout = 3
+    socket.setdefaulttimeout(new_timeout)
+    host_status = False
+    try:
+        transport = paramiko.Transport((host, port))
+        host_status = True
+    except:
+        print('***Warning*** Host {host} on port {port} is down.'.format(
+            host=host, port=port)
+        )
+    socket.setdefaulttimeout(original_timeout)
+    return host_status
 
 # fabric config
 env.user = "ubuntu"
@@ -85,7 +104,11 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             #set environment
             env.hosts = ["ubuntu@"+str(getLocalIPByServerName(vmName + str(vmCounter))),]
             print env.hosts
-            execute(copy)
+            if _is_host_up(env.hosts[0],22):
+                execute(copy)
+            else:
+                print "host is not up"
+
 
             # send the request to newly created local VM (also get the latency)
             isPrime, latency = send_req_to(vmName + str(vmCounter), number)
