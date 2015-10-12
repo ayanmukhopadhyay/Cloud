@@ -135,7 +135,6 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                 localVMs.append([vmName + str(vmCounter), latency, datetime.now()])
 
         if method=="isNumberPrime":
-            isPrime = s.isNumberPrime(number)
             s.send_response (200)
             s.send_header ("Content-type", "text/html")
             s.end_headers ()
