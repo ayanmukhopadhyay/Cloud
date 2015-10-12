@@ -4,7 +4,7 @@ import sys
 import time
 from novaclient.v2 import client
 
-global secondaryVMCounter = 0
+secondaryVMCounter = 0
 
 # Institution: Vanderbilt University
 # Code created for the CS4287-5287 course
@@ -71,7 +71,7 @@ def getLocalIPByServerName(serverName):
 
 
 # main
-def setup (primary = True, counter):
+def setup (primary = True, counter = 0):
 
     #set environment variables
 

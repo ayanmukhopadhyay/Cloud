@@ -1,8 +1,8 @@
 # !/bin/python
 from datetime import datetime
 import BaseHTTPServer
-import nova_server_create
-from math import ceil
+from nova_server_create import setup, getLocalIPByServerName
+
 
 from fabric.api import env, execute, task
 from fabric.operations import sudo, run, put
@@ -10,14 +10,14 @@ from fabric.operations import sudo, run, put
 HOST = ''
 PORT = 8080
 vmName = 'ayan-ubuntu-test-vm'
-global vmCounter = 1234
+vmCounter = 1234
 
 # fabric config
 env.user = "ubuntu"
 env.key_filename = "ayan_horizon.pem"
 
 localVMs = []
-global returnValue
+returnValue = None
 
 @task
 def copy():
@@ -32,19 +32,20 @@ def runPrimeCheck(n):
 def spawnVM(self,counter):
     setup(primary=False,counter=counter)
 
+'''
 def workWithLatency(self,latency):
     latencyRecord.append(latency)
     if len(latencyRecord) > 2:
         averageLatency=sum(latencyRecord[0:len(latencyRecord)-2])/float(len(len(latencyRecord)-2))#calculate average latency
         if (latency-averageLatency)/float(averageLatency)*100 > 20:#check how much latency has risen in percentage
             self.spawnVM(vmCounter+1)
-
+'''
 def send_req_to (vm, req):
     # get the timestamp
     t1 = datetime.now()
 
     # get the ip address from vm name
-    env.hosts = nova_server_create.getLocalIPByServerName(vm)
+    env.hosts = getLocalIPByServerName(vm)
 
     # send the req by using fabric
     execute(runPrimeCheck, req)
@@ -58,6 +59,7 @@ def send_req_to (vm, req):
 
 # MyHTTPHandler inherits from BaseHTTPServer.BaseHTTPRequestHandler
 class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
+    global vmCounter
     def do_GET (s):
         """ Respond to a GET request. """
         print "GET request received; reading the request"
@@ -76,7 +78,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         # check the local server list, whether it's empty
         if not localVMs:
             # create one by using nova_server_create's new method
-            nova_server_create.setup(primary = False, vmCounter)
+            setup(primary = False, counter=vmCounter)
 
             # copy the file checkPrime.py in the local VM
             execute(copy)
@@ -87,12 +89,14 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             vmCounter += 1
 
             # append the newly created VM's name and latency in the list
-            localVMs.append([vmName + str(vmCounter), latency, time()])
+            localVMs.append([vmName + str(vmCounter), latency, datetime.now()])
         else:
             flag = False
             for localVM in localVMs:
                 # search every VM which satisfies the criteria
                 # i.e. check latency and last time stamp
+                #TODO: Get rid of sat_crit
+                satisfies_criteria=True
                 if (satisfies_criteria):
                     # send the request to this VM
                     isPrime, latency = send_req_to(localVM[0], number)
@@ -106,14 +110,14 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                     break
 
             # if there's no such machine
-            if (!flag):
+            if (not flag):
                 # do everything which is upper if() - create a new one and stuff
                 # create one by using nova_server_create's new method
-                nova_server_create.setup(primary = False, vmCounter)
+                setup(primary = False, counter=vmCounter)
 
                 # copy the file checkPrime.py in the local VM
                 # get the ip address from vm name
-                env.hosts = nova_server_create.getLocalIPByServerName(vmName + str(vmCounter))
+                env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
 
                 # copy the file by using fabric
                 execute(copy)
