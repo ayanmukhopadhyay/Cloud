@@ -59,8 +59,8 @@ def send_req_to (vm, req):
 
 # MyHTTPHandler inherits from BaseHTTPServer.BaseHTTPRequestHandler
 class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
-    global vmCounter
     def do_GET (s):
+        global vmCounter
         """ Respond to a GET request. """
         print "GET request received; reading the request"
         # the parameter s is the "self" param
