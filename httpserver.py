@@ -15,6 +15,7 @@ vmCounter = 1234
 # fabric config
 env.user = "ubuntu"
 env.key_filename = "ayan_horizon.pem"
+env.skip_bad_hosts = True
 
 localVMs = []
 returnValue = None
