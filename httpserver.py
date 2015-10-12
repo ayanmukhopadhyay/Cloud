@@ -81,6 +81,8 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             setup(primary = False, counter=vmCounter)
 
             # copy the file checkPrime.py in the local VM
+            #set environment
+            env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
             execute(copy)
 
             # send the request to newly created local VM (also get the latency)
