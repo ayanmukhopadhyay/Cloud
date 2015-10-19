@@ -12,7 +12,7 @@ from datetime import datetime
 def main ():
     print "Instantiating a connection obj"
     try:
-        conn = httplib.HTTPConnection ("localhost", "8080")
+        conn = httplib.HTTPConnection ("10.10.1.74", "8080")
     except:
         print "Exception thrown: ", sys.exc_info()[0]
         raise
@@ -21,6 +21,7 @@ def main ():
         try:
             timePre = datetime.now()
             conn.request("GET", "?53-isNumberPrime")
+            # conn.request("GET", "/testurl", str(53))
         except:
             print "Exception thrown: ", sys.exc_info()[0]
             raise
