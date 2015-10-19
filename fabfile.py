@@ -1,7 +1,7 @@
 from fabric.api import env, execute, task
 from fabric.operations import sudo, run, put
 
-env.hosts = "10.10.1.76"
+env.hosts = "10.10.1.195"
 env.user = "ubuntu"
 env.key_filename = "ayan_horizon.pem"
 
@@ -21,10 +21,10 @@ def ls_root():
     ret = run('ls /')
     print "returned: " + ret
 
-retVal = execute(ls)
-print "retrun value"
-print retVal
-#execute(copy)
-#execute(ls)
+execute(ls)
+#print "retrun value"
+#print retVal
+execute(copy)
+execute(ls)
 #execute(ls_root)
 

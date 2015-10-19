@@ -6,6 +6,7 @@ import sys
 env.user = "ubuntu"
 env.key_filename = "ayan_horizon.pem"
 env.hosts = [sys.argv[1]]
+env.reject_unknown_hosts = False
 
 @task
 def runme():

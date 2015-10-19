@@ -2,7 +2,7 @@
 from datetime import datetime
 import BaseHTTPServer
 from nova_server_create import setup, getLocalIPByServerName
-
+import subprocess
 
 from fabric.api import env, execute, task
 from fabric.operations import sudo, run, put
@@ -65,10 +65,17 @@ def send_req_to (vm, req):
     t1 = datetime.now()
 
     # get the ip address from vm name
-    env.hosts = getLocalIPByServerName(vm)
+    vm_ip = getLocalIPByServerName(vm)
 
     # send the req by using fabric
-    execute(runPrimeCheck, req)
+    command = "python runCheckPrime.py " + vm_ip + " " + req
+    print "command to run: " + command
+    process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
+    output = process.communicate()[0]
+    from time import sleep
+    while True:
+        print "output: " + str(output)
+        sleep(5)
 
     # get the timestamp
     t2 = datetime.now()
@@ -89,6 +96,9 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         # using query string to send what we need
         number = int(path.split('?')[1].split('-')[0])
         method = path.split('?')[1].split('-')[1]
+        # content_length = int(s.headers['Content-length'])
+        # number = int(s.rfile.read(content_length))
+        # method = "isNumberPrime"
         if method == "isNumberPrime":
             pass
         else:
@@ -98,20 +108,42 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         # check the local server list, whether it's empty
         if not localVMs:
             # create one by using nova_server_create's new method
-            setup(primary = False, counter=vmCounter)
+            setup(primary = False, counter = vmCounter)
+            print "Local VM " + str(getLocalIPByServerName(vmName + str(vmCounter))) + " is created"
+
+            #TODO: change the known_hosts file
+            # command = "ssh-keyscan -t rsa,dsa " + getLocalIPByServerName(vmName + str(vmCounter)) + " 2>&1 | sort -u - ~/.ssh/known_hosts > ~/.ssh/tmp_hosts"
+            # print "command to run: " + command
+            # process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
+            # output = process.communicate()[0]
+            # print "output: " + output
+            # command = "mv ~/.ssh/tmp_hosts ~/.ssh/known_hosts"
+            command = "ssh-keyscan " + getLocalIPByServerName(vmName + str(vmCounter)) + " >> ~/.ssh/known_hosts"
+            print "command to run: " + command
+            process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
+            output = process.communicate()[0]
+            print "output: " + output
 
             # copy the file checkPrime.py in the local VM
-            #set environment
-            env.hosts = ["ubuntu@"+str(getLocalIPByServerName(vmName + str(vmCounter))),]
-            print env.hosts
-            while True:
-                if _is_host_up(env.hosts[0],22):
-                    execute(copy)
-
-
+            # set environment
+            # env.hosts = ["ubuntu@" + str(getLocalIPByServerName(vmName + str(vmCounter))),]
+            # print env.hosts
+            # while True:
+            #     if _is_host_up(env.hosts[0],22):
+            #         execute(copy)
+            #         break
+            # command = "ssh -i ayan_horizon.pem ubuntu@" + getLocalIPByServerName(vmName + str(vmCounter))
+            command = "python copyCheckPrime.py " + getLocalIPByServerName(vmName + str(vmCounter))
+            print "command to run: " + command
+            process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
+            output = process.communicate()[0]
+            # from time import sleep
+            # while True:
+            #     print "output: " + str(output)
+            #     sleep(5)
 
             # send the request to newly created local VM (also get the latency)
-            isPrime, latency = send_req_to(vmName + str(vmCounter), number)
+            isPrime, latency = send_req_to(vmName + str(vmCounter), str(number))
 
             vmCounter += 1
 
@@ -122,8 +154,8 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             for localVM in localVMs:
                 # search every VM which satisfies the criteria
                 # i.e. check latency and last time stamp
-                #TODO: Get rid of sat_crit
-                satisfies_criteria=True
+                #TODO: Get rid of satisfies_criteria
+                satisfies_criteria = True
                 if (satisfies_criteria):
                     # send the request to this VM
                     isPrime, latency = send_req_to(localVM[0], number)
@@ -169,6 +201,9 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
+    print "Populating current localVMs directory"
+    #TODO: Populate localVMs directory to get the already existing VMs - set latency and last time to zero
+
     print "Instantiating a BaseHTTPServer"
     server_class = BaseHTTPServer.HTTPServer
     httpd = server_class ((HOST, PORT), MyHTTPHandler)

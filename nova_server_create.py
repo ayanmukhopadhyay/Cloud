@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import logging
 from novaclient.v2 import client
 
 secondaryVMCounter = 0
@@ -73,7 +74,8 @@ def getLocalIPByServerName(serverName):
 # main
 def setup (primary = True, counter = 0):
 
-    #set environment variables
+    # disable warnings
+    logging.captureWarnings(True)
 
     # get our credentials for version 2 of novaclient
     creds = get_nova_creds()
