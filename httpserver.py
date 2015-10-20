@@ -274,6 +274,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                 found = True# found one okay VM. No need to spawn another. Implement strategy
         if strategy == "roundRobin":
             "print roundRobin"
+            print vmList
             print next(vmListCycle)
             print next(vmListCycle)
             print next(vmListCycle)
