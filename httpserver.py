@@ -273,6 +273,13 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             if lastLatency < 5:
                 found = True# found one okay VM. No need to spawn another. Implement strategy
         if strategy == "roundRobin":
+            "print roundRobin"
+            print next(vmListCycle)
+            print next(vmListCycle)
+            print next(vmListCycle)
+            print next(vmListCycle)
+            print next(vmListCycle)
+
             if found:
                 return next(vmListCycle)#do round robin
         if strategy == "waitedPolling":
