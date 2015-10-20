@@ -202,7 +202,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                     # satisfies_criteria = True
                     # if (satisfies_criteria):
                         # send the request to this VM
-                isPrime, latency = send_req_to(machineToPing, number, reqCounter)
+                isPrime, latency = send_req_to(machineToPing, str(number), reqCounter)
 
                 # update the latency, timestamp
                 localVMs[machineToPing][0].append(latency)
@@ -225,11 +225,11 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                     print "Local VM " + str(vm[0]) + " is created"
                     #env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
                     #execute(copy)
-                    isPrime, latency = send_req_to(vm, number, reqCounter)
+                    isPrime, latency = send_req_to(vm, str(number), reqCounter)
                     localVMs.update({vm[0]: [[latency], [datetime.now()]]})
                 else:
                     #we wanted a new VM but we have exceeded capacity
-                    isPrime, latency = send_req_to(vmList[0], number, reqCounter)
+                    isPrime, latency = send_req_to(vmList[0], str(number), reqCounter)
                     localVMs.update({vm[0]: [[latency], [datetime.now()]]})
 
 
