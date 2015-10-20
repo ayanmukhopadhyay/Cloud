@@ -182,7 +182,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
             # send the request to newly created local VM (also get the latency)
             isPrime, latency = send_req_to(vm[0], str(number),reqCounter)
-            vmList.append(vm[0])
+            #vmList.append(vm[0])
 
             #vmCounter += 1
 
