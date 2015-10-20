@@ -15,8 +15,8 @@ import socket
 HOST = ''
 PORT = 8080
 vmName = 'ayan-ubuntu-test-vm'
-vmCounter = 1234
-vmDomain = [["ayan-ubuntu-test-vm-worker-1","1.1"],["ayan-ubuntu-test-vm-worker-2","1.1"],["ayan-ubuntu-test-vm-worker-3","1.1"]]
+#vmCounter = 1234
+vmDomain = [["ayan-ubuntu-test-vm-worker-1","10.10.3.204"],["ayan-ubuntu-test-vm-worker-2","10.10.3.205"],["ayan-ubuntu-test-vm-worker-3","10.10.3.206"]]
 reqCounter=0#track number of requests to sleep
 
 def _is_host_up(host, port):
@@ -42,6 +42,7 @@ env.skip_bad_hosts = True
 
 localVMs = {}
 vmList = []#stores only names
+vmListCycle = cycle(vmList)
 returnValue = None
 loadBalancingStrategy = "roundRobin"
 #loadBalancingStrategy = "waitedPolling"
@@ -73,23 +74,27 @@ def send_req_to (vm, req, reqCounter):
 
     # get the ip address from vm name
     vm_ip = getLocalIPByServerName(vm)
-
+    print vm_ip
     # send the req by using fabric
-    command = "python runCheckPrime.py " + vm_ip + " " + req + " " + reqCounter
+    command = "python runCheckPrime.py " + str(vm_ip) + " " + req + " " + str(reqCounter)
     print "command to run: " + command
     process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
     output = process.communicate()[0]
-    from time import sleep
-    while True:
-        print "output: " + str(output)
-        sleep(5)
+    print output
+    output = output.split('@')[1]
+    print output
+
+    # from time import sleep
+    # while True:
+    #     print "output: " + str(output)
+    #     sleep(5)
 
     # get the timestamp
     t2 = datetime.now()
 
     # return latency
-    latency = t2 - t1
-    return (returnValue, latency)
+    latency = (t2 - t1).total_seconds()
+    return (output, latency)
 
 def plotLatency():
     latencies = []#will store datetime and latency values in a 2d array
@@ -113,6 +118,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET (s):
         global vmCounter
         global reqCounter
+        global vmListCycle
         """ Respond to a GET request. """
         print "GET request received; reading the request"
         # the parameter s is the "self" param
@@ -125,20 +131,23 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         # number = int(s.rfile.read(content_length))
         # method = "isNumberPrime"
         if method == "isNumberPrime":
+            reqCounter+=1
             pass
         else:
-            reqCounter+=1
             print "Error: Bad request"
             s.send_response(400)
 
         # check the local server list, whether it's empty
         if not localVMs:
+            print "local vm doesnt exist"
             # create one by using nova_server_create's new method
             #setup(primary = False, counter = vmCounter)
             vm = bringVMFromPool(vmDomain,vmList)
+            print vm
             if vm != None:
-                vmList.append(vm)
-                print "Local VM " + str(getLocalIPByServerName(vmName + str(vmCounter))) + " is created"
+                vmList.append(vm[0])
+                vmListCycle=cycle(vmList)
+                print "Local VM " + str(vm[1]) + " is created"
             '''
             #TODO: change the known_hosts file
             # command = "ssh-keyscan -t rsa,dsa " + getLocalIPByServerName(vmName + str(vmCounter)) + " 2>&1 | sort -u - ~/.ssh/known_hosts > ~/.ssh/tmp_hosts"
@@ -162,7 +171,9 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             #         execute(copy)
             #         break
             # command = "ssh -i ayan_horizon.pem ubuntu@" + getLocalIPByServerName(vmName + str(vmCounter))
-            command = "python copyCheckPrime.py " + getLocalIPByServerName(vmName + str(vmCounter))
+            #command = "python copyCheckPrime.py " + getLocalIPByServerName(vmName + str(vmCounter))
+            #command = "python copyCheckPrime.py " + getLocalIPByServerName(vm[0])
+            command = "python copyCheckPrime.py " + str(vm[1])
             print "command to run: " + command
             process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
             output = process.communicate()[0]
@@ -172,17 +183,26 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             #     sleep(5)
 
             # send the request to newly created local VM (also get the latency)
-            isPrime, latency = send_req_to(vmName + str(vmCounter), str(number),reqCounter)
-            vmList.append(vmName + str(vmCounter))
+            #isPrime, latency = send_req_to(vm[0], str(number),reqCounter)
+            #modified to send counter per server rather than total counter
+            print vm[0]
+            try:
+                isPrime, latency = send_req_to(vm[0], str(number),len(localVMs[vm[0]][0])+1)
+            except KeyError:
+                isPrime, latency = send_req_to(vm[0], str(number),1)
 
-            vmCounter += 1
+            #vmList.append(vm[0])
+
+            #vmCounter += 1
 
             # append the newly created VM's name and latency in the list
             #localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
-            localVMs.update({vm: [[latency], [datetime.now()]]})
+            localVMs.update({vm[0]: [[latency], [datetime.now()]]})
         else:
+            print "local vm exists"
             #flag = False
             machineToPing = s.getMachineToPing(loadBalancingStrategy)
+            print machineToPing
             if machineToPing != -1:
                 #for localVM in localVMs:
 
@@ -191,7 +211,10 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                     # satisfies_criteria = True
                     # if (satisfies_criteria):
                         # send the request to this VM
-                isPrime, latency = send_req_to(machineToPing, number, reqCounter)
+                try:
+                    isPrime, latency = send_req_to(machineToPing, str(number), len(localVMs[machineToPing][0])+1)
+                except KeyError:
+                    isPrime, latency = send_req_to(machineToPing, str(number), 1)
 
                 # update the latency, timestamp
                 localVMs[machineToPing][0].append(latency)
@@ -208,18 +231,29 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                 # do everything which is upper if() - create a new one and stuff
                 # create one by using nova_server_create's new method
                 #setup(primary = False, counter=vmCounter)
+                print "Domain is " + str(vmDomain)
+                print "List is " + str(vmList)
                 vm = bringVMFromPool(vmDomain,vmList)
                 if vm != None:
-                    vmList.append(vm)
-                    print "Local VM " + str(getLocalIPByServerName(vmName + str(vmCounter))) + " is created"
-                    env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
-                    execute(copy)
-                    isPrime, latency = send_req_to(vm, number, reqCounter)
-                    localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
+                    vmList.append(vm[0])
+                    vmListCycle = cycle(vmList)
+                    print "Local VM " + str(vm[0]) + " is created"
+                    print "VM List is : " + str(vmList)
+                    #env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
+                    #execute(copy)
+                    try:
+                        isPrime, latency = send_req_to(vm[0], str(number), len(localVMs[vm[0]][0])+1)
+                    except KeyError:
+                        isPrime, latency = send_req_to(vm[0], str(number), 1)
+                    localVMs.update({vm[0]: [[latency], [datetime.now()]]})
                 else:
                     #we wanted a new VM but we have exceeded capacity
-                    isPrime, latency = send_req_to(vmList[0], number, reqCounter)
-                    localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
+                    print localVMs[vm[0]][0]
+                    try:
+                        isPrime, latency = send_req_to(vmList[0], str(number), len(localVMs[vm[0]][0])+1)
+                    except KeyError:
+                        isPrime, latency = send_req_to(vmList[0], str(number), 1)
+                    localVMs.update({vm[0]: [[latency], [datetime.now()]]})
 
 
 
@@ -251,14 +285,27 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             s.wfile.write ("</body.<html>")
 
     def getMachineToPing(s,strategy):
+        print localVMs
         found = False # can we find even 1 okay VM?
         for key,value in localVMs.iteritems():
-            lastLatency = value[-1]
+            lastLatency = value[0][-1]
+            print lastLatency
             if lastLatency < 5:
                 found = True# found one okay VM. No need to spawn another. Implement strategy
         if strategy == "roundRobin":
+            "print roundRobin"
+            print vmList
+            # print next(vmListCycle)
+            # print next(vmListCycle)
+            # print next(vmListCycle)
+            # print next(vmListCycle)
+            # print next(vmListCycle)
+            # print vmListCycle.next()
+            # print vmListCycle.next()
+            # print vmListCycle.next()
+
             if found:
-                return next(vmList)#do round robin
+                return vmListCycle.next()#do round robin
         if strategy == "waitedPolling":
             if found:
                 return vmList[s.getLeastCurrentLatency()]
