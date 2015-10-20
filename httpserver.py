@@ -130,9 +130,9 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         # number = int(s.rfile.read(content_length))
         # method = "isNumberPrime"
         if method == "isNumberPrime":
+            reqCounter+=1
             pass
         else:
-            reqCounter+=1
             print "Error: Bad request"
             s.send_response(400)
 
