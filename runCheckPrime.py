@@ -15,7 +15,7 @@ def runme():
     returnValue = run('python /home/ubuntu/checkPrime.py ' + sys.argv[2])
     # print "ran the file into " + env.hosts[0]
     #randomly generate probability of
-    if counter == 10 and counter < 15:
+    if counter == 10 and counter < 25:
         time.sleep(10)
     print "@"+str(returnValue)+"@"
 
