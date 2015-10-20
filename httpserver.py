@@ -147,7 +147,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             pass
         elif method == "over":
             plotLatency()
-            #sys.exit()
+            s.send_response(400)
         else:
             print "Error: Bad request"
             s.send_response(400)
