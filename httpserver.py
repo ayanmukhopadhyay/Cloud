@@ -97,7 +97,7 @@ def send_req_to (vm, req, reqCounter):
     return (output, latency)
 
 def plotLatency():
-    latencies = []#will store datetime and latency values in a 2d array
+    latencies = []
     for key,value in localVMs.iteritems():
         if len(latencies) == 0:
             latencies.append(value[0])#update latencies
@@ -107,10 +107,13 @@ def plotLatency():
             latencies[1].extend(value[1])
     #sort according to time as different vms were spawned at different times
     print latencies[0]
-    print latencies[1]    
-    latencies = np.array(latencies)
-    latencies = latencies[np.argsort(latencies[:,1])]
-    np.save("latencies",latencies)
+    print latencies[1]
+    latencyNP = np.empty((len(latencies[0]),2))
+    for counter in range(len(latencies[0])):
+        latencyNP[counter,0] = latencies[0][counter]
+        latencyNP[counter,1] = latencies[1][counter]
+    latencyNP = latencyNP[np.argsort(latencies[:,1])]
+    np.save("latencies",latencyNP)
 
 
 
