@@ -16,7 +16,7 @@ HOST = ''
 PORT = 8080
 vmName = 'ayan-ubuntu-test-vm'
 vmCounter = 1234
-vmDomain = [["ayan-ubuntu-test-vm-worker-1","1.1"],["ayan-ubuntu-test-vm-worker-2","1.1"],["ayan-ubuntu-test-vm-worker-3","1.1"]]
+vmDomain = [["ayan-ubuntu-test-vm-worker-1","10.10.3.204"],["ayan-ubuntu-test-vm-worker-2","10.10.3.205"],["ayan-ubuntu-test-vm-worker-3","10.10.3.206"]]
 reqCounter=0#track number of requests to sleep
 
 def _is_host_up(host, port):
