@@ -225,6 +225,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                 if vm != None:
                     vmList.append(vm[0])
                     print "Local VM " + str(vm[0]) + " is created"
+                    print "VM List is : " + str(vmList)
                     #env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
                     #execute(copy)
                     isPrime, latency = send_req_to(vm[0], str(number), reqCounter)
