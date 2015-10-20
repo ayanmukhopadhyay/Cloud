@@ -187,7 +187,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
             # append the newly created VM's name and latency in the list
             #localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
-            localVMs.update({vm: [[latency], [datetime.now()]]})
+            localVMs.update({vm[0]: [[latency], [datetime.now()]]})
         else:
             print "local vm exists"
             #flag = False
@@ -220,15 +220,15 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                 vm = bringVMFromPool(vmDomain,vmList)
                 if vm != None:
                     vmList.append(vm)
-                    print "Local VM " + str(getLocalIPByServerName(vmName + str(vmCounter))) + " is created"
-                    env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
+                    print "Local VM " + str(vm[0]) + " is created"
+                    #env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
                     #execute(copy)
                     isPrime, latency = send_req_to(vm, number, reqCounter)
-                    localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
+                    localVMs.update({vm[0]: [[latency], [datetime.now()]]})
                 else:
                     #we wanted a new VM but we have exceeded capacity
                     isPrime, latency = send_req_to(vmList[0], number, reqCounter)
-                    localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
+                    localVMs.update({vm[0]: [[latency], [datetime.now()]]})
 
 
 
