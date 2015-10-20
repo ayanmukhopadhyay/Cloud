@@ -116,6 +116,10 @@ def plotLatency():
     latencyNP = latencyNP[np.argsort(latencyNP[:,1])]
     print "saving"
     np.save("latencies",latencyNP)
+    with open("latencies.txt",'w+') as dest:
+        for counter in range(len(latencies[0])):
+            dest.writelines(latencies[0,counter] + "," + latencies[1,counter])
+        dest.flush()
 
 
 
@@ -143,7 +147,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             pass
         elif method == "over":
             plotLatency()
-            sys.exit()
+            #sys.exit()
         else:
             print "Error: Bad request"
             s.send_response(400)
