@@ -238,7 +238,8 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                     localVMs.update({vm[0]: [[latency], [datetime.now()]]})
                 else:
                     #we wanted a new VM but we have exceeded capacity
-                    isPrime, latency = send_req_to(vmList[0], str(number), (localVMs[vm[0]][0])+1)
+                    print localVMs[vm[0]][0]
+                    isPrime, latency = send_req_to(vmList[0], str(number), len(localVMs[vm[0]][0])+1)
                     localVMs.update({vm[0]: [[latency], [datetime.now()]]})
 
 
