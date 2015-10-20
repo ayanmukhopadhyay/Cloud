@@ -118,7 +118,7 @@ def plotLatency():
     np.save("latencies",latencyNP)
     with open("latencies.txt",'w+') as dest:
         for counter in range(len(latencyNP[0])):
-            dest.writelines(latencyNP[0,counter] + "," + latencyNP[1,counter])
+            dest.writelines(str(latencyNP[0,counter]) + "," + str(latencyNP[1,counter]))
         dest.flush()
 
 
