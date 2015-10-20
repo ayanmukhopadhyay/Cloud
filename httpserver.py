@@ -108,7 +108,7 @@ def plotLatency():
     #sort according to time as different vms were spawned at different times
     print latencies[0]
     print latencies[1]
-    latencyNP = np.empty((len(latencies[0]),2))
+    latencyNP = np.empty((len(latencies[0]),2),dtype=object)
     for counter in range(len(latencies[0])):
         latencyNP[counter,0] = latencies[0][counter]
         latencyNP[counter,1] = latencies[1][counter]
