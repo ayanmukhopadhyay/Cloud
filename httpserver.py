@@ -138,7 +138,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             vm = bringVMFromPool(vmDomain,vmList)
             if vm != None:
                 vmList.append(vm)
-                print "Local VM " + str(getLocalIPByServerName(vm) + " is created"
+                print "Local VM " + str(getLocalIPByServerName(vm)) + " is created"
             '''
             #TODO: change the known_hosts file
             # command = "ssh-keyscan -t rsa,dsa " + getLocalIPByServerName(vmName + str(vmCounter)) + " 2>&1 | sort -u - ~/.ssh/known_hosts > ~/.ssh/tmp_hosts"
