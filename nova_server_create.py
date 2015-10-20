@@ -72,10 +72,10 @@ def getLocalIPByServerName(serverName):
 
 def bringVMFromPool(vmDomain, listVMs):
     for vm in vmDomain:
-        if vm not in listVMs:
+        print vm[0]
+        if vm[0] not in listVMs:
             return vm
-    else:
-        return None
+    return None
 
 
 def setup (primary = True, counter = 0):
