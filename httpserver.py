@@ -223,11 +223,11 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                 print "List is " + str(vmList)
                 vm = bringVMFromPool(vmDomain,vmList)
                 if vm != None:
-                    vmList.append(vm)
+                    vmList.append(vm[0])
                     print "Local VM " + str(vm[0]) + " is created"
                     #env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
                     #execute(copy)
-                    isPrime, latency = send_req_to(vm, str(number), reqCounter)
+                    isPrime, latency = send_req_to(vm[0], str(number), reqCounter)
                     localVMs.update({vm[0]: [[latency], [datetime.now()]]})
                 else:
                     #we wanted a new VM but we have exceeded capacity
