@@ -76,7 +76,7 @@ def send_req_to (vm, req, reqCounter):
     vm_ip = getLocalIPByServerName(vm)
     print vm_ip
     # send the req by using fabric
-    command = "python runCheckPrime.py " + vm_ip + " " + req + " " + str(reqCounter)
+    command = "python runCheckPrime.py " + str(vm_ip) + " " + req + " " + str(reqCounter)
     print "command to run: " + command
     process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
     output = process.communicate()[0]
