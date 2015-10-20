@@ -138,8 +138,8 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             vm = bringVMFromPool(vmDomain,vmList)
             print vm
             if vm != None:
-                vmList.append(vm)
-                print "Local VM " + str(getLocalIPByServerName(vm)) + " is created"
+                vmList.append(vm[0])
+                print "Local VM " + str(getLocalIPByServerName(vm[0])) + " is created"
             '''
             #TODO: change the known_hosts file
             # command = "ssh-keyscan -t rsa,dsa " + getLocalIPByServerName(vmName + str(vmCounter)) + " 2>&1 | sort -u - ~/.ssh/known_hosts > ~/.ssh/tmp_hosts"
@@ -164,7 +164,8 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             #         break
             # command = "ssh -i ayan_horizon.pem ubuntu@" + getLocalIPByServerName(vmName + str(vmCounter))
             #command = "python copyCheckPrime.py " + getLocalIPByServerName(vmName + str(vmCounter))
-            command = "python copyCheckPrime.py " + getLocalIPByServerName(vm)
+            #command = "python copyCheckPrime.py " + getLocalIPByServerName(vm[0])
+            command = "python copyCheckPrime.py " + str(vm[1])
             print "command to run: " + command
             process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
             output = process.communicate()[0]
