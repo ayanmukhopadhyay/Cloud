@@ -114,6 +114,7 @@ def plotLatency():
         latencyNP[counter,0] = latencies[0][counter]
         latencyNP[counter,1] = latencies[1][counter]
     latencyNP = latencyNP[np.argsort(latencyNP[:,1])]
+    print "saving"
     np.save("latencies",latencyNP)
 
 
