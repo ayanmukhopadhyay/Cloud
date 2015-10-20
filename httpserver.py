@@ -15,7 +15,7 @@ import socket
 HOST = ''
 PORT = 8080
 vmName = 'ayan-ubuntu-test-vm'
-vmCounter = 1234
+#vmCounter = 1234
 vmDomain = [["ayan-ubuntu-test-vm-worker-1","10.10.3.204"],["ayan-ubuntu-test-vm-worker-2","10.10.3.205"],["ayan-ubuntu-test-vm-worker-3","10.10.3.206"]]
 reqCounter=0#track number of requests to sleep
 
@@ -182,7 +182,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
             # send the request to newly created local VM (also get the latency)
             isPrime, latency = send_req_to(vm[0], str(number),reqCounter)
-            vmList.append(vmName + str(vmCounter))
+            vmList.append(vm[0])
 
             vmCounter += 1
 
