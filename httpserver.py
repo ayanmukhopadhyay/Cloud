@@ -92,7 +92,7 @@ def send_req_to (vm, req, reqCounter):
     t2 = datetime.now()
 
     # return latency
-    latency = t2 - t1
+    latency = (t2 - t1).total_seconds()
     return (output, latency)
 
 def plotLatency():
