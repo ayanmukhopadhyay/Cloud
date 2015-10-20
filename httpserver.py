@@ -125,14 +125,16 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         # way to get hold of the path that was sent:
         path = s.path
         # using query string to send what we need
-        number = int(path.split('?')[1].split('-')[0])
         method = path.split('?')[1].split('-')[1]
         # content_length = int(s.headers['Content-length'])
         # number = int(s.rfile.read(content_length))
         # method = "isNumberPrime"
         if method == "isNumberPrime":
+            number = int(path.split('?')[1].split('-')[0])
             reqCounter+=1
             pass
+        elif method == "over":
+            plotLatency()
         else:
             print "Error: Bad request"
             s.send_response(400)
