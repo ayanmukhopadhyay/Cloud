@@ -186,7 +186,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             #isPrime, latency = send_req_to(vm[0], str(number),reqCounter)
             #modified to send counter per server rather than total counter
             print vm[0]
-            print localVMs[vm[0]][0]
+            print localVMs
             isPrime, latency = send_req_to(vm[0], str(number),(localVMs[vm[0]][0])+1)
 
             #vmList.append(vm[0])
