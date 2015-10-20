@@ -20,7 +20,7 @@ def main ():
     for counter in range(100):
         print "sending a GET request to our http server"
         try:
-	    numberCheck = str(random.randint(1,100))
+	    numberCheck = str(random.randint(1,5))
             timePre = datetime.now()
 	    
             conn.request("GET", "?"+numberCheck+"-isNumberPrime")
@@ -62,6 +62,9 @@ def main ():
         except:
             print "Exception thrown: ", sys.exc_info()[0]
             raise
+
+    conn.request("GET", "?"+str(-1)+"-over")
+    resp = conn.getresponse ()
 
 # invoke main
 if __name__ == "__main__":
