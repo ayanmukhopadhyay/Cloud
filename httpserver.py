@@ -187,7 +187,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             #modified to send counter per server rather than total counter
             print vm[0]
             try:
-                isPrime, latency = send_req_to(vm[0], str(number),(localVMs[vm[0]][0])+1)
+                isPrime, latency = send_req_to(vm[0], str(number),len(localVMs[vm[0]][0])+1)
             except KeyError:
                 isPrime, latency = send_req_to(vm[0], str(number),1)
 
@@ -212,7 +212,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                     # if (satisfies_criteria):
                         # send the request to this VM
                 try:
-                    isPrime, latency = send_req_to(machineToPing, str(number), (localVMs[machineToPing][0])+1)
+                    isPrime, latency = send_req_to(machineToPing, str(number), len(localVMs[machineToPing][0])+1)
                 except KeyError:
                     isPrime, latency = send_req_to(machineToPing, str(number), 1)
 
@@ -242,7 +242,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                     #env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
                     #execute(copy)
                     try:
-                        isPrime, latency = send_req_to(vm[0], str(number), (localVMs[vm[0]][0])+1)
+                        isPrime, latency = send_req_to(vm[0], str(number), len(localVMs[vm[0]][0])+1)
                     except KeyError:
                         isPrime, latency = send_req_to(vm[0], str(number), 1)
                     localVMs.update({vm[0]: [[latency], [datetime.now()]]})
