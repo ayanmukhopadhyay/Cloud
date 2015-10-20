@@ -1,5 +1,6 @@
 from fabric.api import env, execute, task
 from fabric.operations import run, put
+import time
 
 import sys
 
@@ -10,8 +11,11 @@ env.reject_unknown_hosts = False
 
 @task
 def runme():
+    counter = int(sys.argv[3])
     returnValue = run('python /home/ubuntu/checkPrime.py ' + sys.argv[2])
     # print "ran the file into " + env.hosts[0]
+    if counter > 50 and counter < 60:
+        time.sleep(10)
     print returnValue
 
 execute(runme)

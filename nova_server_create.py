@@ -70,8 +70,14 @@ def getLocalIPByServerName(serverName):
             except IndexError:
                 return None
 
+def bringVMFromPool(vmDomain, listVMs):
+    for vm in vmDomain:
+        if vm not in listVMs:
+            return vm
+    else:
+        return None
 
-# main
+
 def setup (primary = True, counter = 0):
 
     # disable warnings
@@ -126,6 +132,7 @@ def setup (primary = True, counter = 0):
                 break
         if not serverExists:
             server = nova.servers.create(**attrs)
+            nova.servers.interface_detach(server,22)
 
     except:
         print "Exception thrown: ", sys.exc_info()[0]
