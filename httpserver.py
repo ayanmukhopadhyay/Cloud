@@ -41,7 +41,8 @@ env.key_filename = "ayan_horizon.pem"
 env.skip_bad_hosts = True
 
 localVMs = {}
-vmList = cycle([])#stores only names
+vmList = []#stores only names
+vmListCycle = cycle(vmList)
 returnValue = None
 loadBalancingStrategy = "roundRobin"
 #loadBalancingStrategy = "waitedPolling"
@@ -269,7 +270,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                 found = True# found one okay VM. No need to spawn another. Implement strategy
         if strategy == "roundRobin":
             if found:
-                return next(vmList)#do round robin
+                return next(vmListCycle)#do round robin
         if strategy == "waitedPolling":
             if found:
                 return vmList[s.getLeastCurrentLatency()]
