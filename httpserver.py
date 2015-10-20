@@ -106,6 +106,8 @@ def plotLatency():
             latencies[0].extend(value[0])
             latencies[1].extend(value[1])
     #sort according to time as different vms were spawned at different times
+    print latencies[0]
+    print latencies[1]    
     latencies = np.array(latencies)
     latencies = latencies[np.argsort(latencies[:,1])]
     np.save("latencies",latencies)
