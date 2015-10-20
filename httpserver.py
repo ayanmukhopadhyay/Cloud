@@ -136,6 +136,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             # create one by using nova_server_create's new method
             #setup(primary = False, counter = vmCounter)
             vm = bringVMFromPool(vmDomain,vmList)
+            print vm
             if vm != None:
                 vmList.append(vm)
                 print "Local VM " + str(getLocalIPByServerName(vm)) + " is created"
