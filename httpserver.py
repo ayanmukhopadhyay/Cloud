@@ -126,6 +126,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         global vmListCycle
         """ Respond to a GET request. """
         print "GET request received; reading the request"
+        print s.path
         # the parameter s is the "self" param
         # way to get hold of the path that was sent:
         path = s.path
