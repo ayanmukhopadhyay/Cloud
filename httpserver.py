@@ -41,7 +41,7 @@ env.key_filename = "ayan_horizon.pem"
 env.skip_bad_hosts = True
 
 localVMs = {}
-vmList = []#stores only names
+vmList = cycle([])#stores only names
 returnValue = None
 loadBalancingStrategy = "roundRobin"
 #loadBalancingStrategy = "waitedPolling"
