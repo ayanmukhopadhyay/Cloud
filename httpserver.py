@@ -264,7 +264,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         print localVMs
         found = False # can we find even 1 okay VM?
         for key,value in localVMs.iteritems():
-            lastLatency = value[-1]
+            lastLatency = value[0][-1]
             if lastLatency < 5:
                 found = True# found one okay VM. No need to spawn another. Implement strategy
         if strategy == "roundRobin":
