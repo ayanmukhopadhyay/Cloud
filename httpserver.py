@@ -283,13 +283,12 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             # print next(vmListCycle)
             # print next(vmListCycle)
             # print next(vmListCycle)
-            print vmListCycle.next()
-            print vmListCycle.next()
-            print vmListCycle.next()
-
+            # print vmListCycle.next()
+            # print vmListCycle.next()
+            # print vmListCycle.next()
 
             if found:
-                return next(vmListCycle)#do round robin
+                return vmListCycle.next()#do round robin
         if strategy == "waitedPolling":
             if found:
                 return vmList[s.getLeastCurrentLatency()]
