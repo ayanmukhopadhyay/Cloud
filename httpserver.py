@@ -162,7 +162,8 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             #         execute(copy)
             #         break
             # command = "ssh -i ayan_horizon.pem ubuntu@" + getLocalIPByServerName(vmName + str(vmCounter))
-            command = "python copyCheckPrime.py " + getLocalIPByServerName(vmName + str(vmCounter))
+            #command = "python copyCheckPrime.py " + getLocalIPByServerName(vmName + str(vmCounter))
+            command = "python copyCheckPrime.py " + getLocalIPByServerName(vm)
             print "command to run: " + command
             process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
             output = process.communicate()[0]
