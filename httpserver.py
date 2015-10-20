@@ -278,11 +278,15 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         if strategy == "roundRobin":
             "print roundRobin"
             print vmList
-            print next(vmListCycle)
-            print next(vmListCycle)
-            print next(vmListCycle)
-            print next(vmListCycle)
-            print next(vmListCycle)
+            # print next(vmListCycle)
+            # print next(vmListCycle)
+            # print next(vmListCycle)
+            # print next(vmListCycle)
+            # print next(vmListCycle)
+            print vmListCycle.next()
+            print vmListCycle.next()
+            print vmListCycle.next()
+
 
             if found:
                 return next(vmListCycle)#do round robin
