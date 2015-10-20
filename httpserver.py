@@ -75,7 +75,7 @@ def send_req_to (vm, req, reqCounter):
     vm_ip = getLocalIPByServerName(vm)
 
     # send the req by using fabric
-    command = "python runCheckPrime.py " + vm_ip + " " + req + " " + reqCounter
+    command = "python runCheckPrime.py " + vm_ip + " " + req + " " + str(reqCounter)
     print "command to run: " + command
     process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
     output = process.communicate()[0]
@@ -175,7 +175,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             #     sleep(5)
 
             # send the request to newly created local VM (also get the latency)
-            isPrime, latency = send_req_to(vmName + str(vmCounter), str(number),reqCounter)
+            isPrime, latency = send_req_to(vm[0], str(number),reqCounter)
             vmList.append(vmName + str(vmCounter))
 
             vmCounter += 1
