@@ -79,17 +79,21 @@ def send_req_to (vm, req, reqCounter):
     print "command to run: " + command
     process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
     output = process.communicate()[0]
-    from time import sleep
-    while True:
-        print "output: " + str(output)
-        sleep(5)
+    print output
+    output = output.split('@')[1]
+    print output
+
+    # from time import sleep
+    # while True:
+    #     print "output: " + str(output)
+    #     sleep(5)
 
     # get the timestamp
     t2 = datetime.now()
 
     # return latency
     latency = t2 - t1
-    return (returnValue, latency)
+    return (output, latency)
 
 def plotLatency():
     latencies = []#will store datetime and latency values in a 2d array
@@ -133,13 +137,14 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
         # check the local server list, whether it's empty
         if not localVMs:
+            print "local vm doesnt exist"
             # create one by using nova_server_create's new method
             #setup(primary = False, counter = vmCounter)
             vm = bringVMFromPool(vmDomain,vmList)
             print vm
             if vm != None:
                 vmList.append(vm[0])
-                print "Local VM " + str(getLocalIPByServerName(vm[0])) + " is created"
+                print "Local VM " + str(vm[1]) + " is created"
             '''
             #TODO: change the known_hosts file
             # command = "ssh-keyscan -t rsa,dsa " + getLocalIPByServerName(vmName + str(vmCounter)) + " 2>&1 | sort -u - ~/.ssh/known_hosts > ~/.ssh/tmp_hosts"
@@ -184,6 +189,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             #localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
             localVMs.update({vm: [[latency], [datetime.now()]]})
         else:
+            print "local vm exists"
             #flag = False
             machineToPing = s.getMachineToPing(loadBalancingStrategy)
             if machineToPing != -1:
@@ -216,7 +222,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                     vmList.append(vm)
                     print "Local VM " + str(getLocalIPByServerName(vmName + str(vmCounter))) + " is created"
                     env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
-                    execute(copy)
+                    #execute(copy)
                     isPrime, latency = send_req_to(vm, number, reqCounter)
                     localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
                 else:
