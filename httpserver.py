@@ -219,6 +219,8 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                 # do everything which is upper if() - create a new one and stuff
                 # create one by using nova_server_create's new method
                 #setup(primary = False, counter=vmCounter)
+                print "Domain is " + str(vmDomain)
+                print "List is " + str(vmList)
                 vm = bringVMFromPool(vmDomain,vmList)
                 if vm != None:
                     vmList.append(vm)
