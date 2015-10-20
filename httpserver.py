@@ -184,7 +184,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             isPrime, latency = send_req_to(vm[0], str(number),reqCounter)
             vmList.append(vm[0])
 
-            vmCounter += 1
+            #vmCounter += 1
 
             # append the newly created VM's name and latency in the list
             #localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
