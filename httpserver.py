@@ -118,6 +118,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET (s):
         global vmCounter
         global reqCounter
+        global vmListCycle
         """ Respond to a GET request. """
         print "GET request received; reading the request"
         # the parameter s is the "self" param
@@ -145,6 +146,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             print vm
             if vm != None:
                 vmList.append(vm[0])
+                vmListCycle=cycle(vmList)
                 print "Local VM " + str(vm[1]) + " is created"
             '''
             #TODO: change the known_hosts file
@@ -224,6 +226,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                 vm = bringVMFromPool(vmDomain,vmList)
                 if vm != None:
                     vmList.append(vm[0])
+                    vmListCycle = cycle(vmList)
                     print "Local VM " + str(vm[0]) + " is created"
                     print "VM List is : " + str(vmList)
                     #env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
