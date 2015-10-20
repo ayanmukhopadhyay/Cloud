@@ -11,6 +11,7 @@ from fabric.operations import sudo, run, put
 from fabric.api import run, sudo, local, env
 import paramiko
 import socket
+import sys
 
 HOST = ''
 PORT = 8080
@@ -141,6 +142,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             pass
         elif method == "over":
             plotLatency()
+            sys.exit()
         else:
             print "Error: Bad request"
             s.send_response(400)
