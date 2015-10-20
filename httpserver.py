@@ -192,6 +192,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             print "local vm exists"
             #flag = False
             machineToPing = s.getMachineToPing(loadBalancingStrategy)
+            print machineToPing
             if machineToPing != -1:
                 #for localVM in localVMs:
 
@@ -260,6 +261,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             s.wfile.write ("</body.<html>")
 
     def getMachineToPing(s,strategy):
+        print localVMs
         found = False # can we find even 1 okay VM?
         for key,value in localVMs.iteritems():
             lastLatency = value[-1]
