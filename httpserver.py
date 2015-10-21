@@ -153,7 +153,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             s.send_response(400)
 
         # check the local server list, whether it's empty
-        if not localVMs:
+        if not localVMs and method=="isNumberPrime":
             print "local vm doesnt exist"
             # create one by using nova_server_create's new method
             #setup(primary = False, counter = vmCounter)
