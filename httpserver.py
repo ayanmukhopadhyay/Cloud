@@ -336,7 +336,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             lastLatencies.append(value[0][-1]) #get the last latency from this VM
             lastPolled.append(value[1][-1])#get the last polled date from this VM
         #if VMs havent been polled for a minute, poll it once to update latency and see whats happennning
-        diffLastPolled = [abs(datetime.Now - lastPolledTime).total_seconds() for lastPolledTime in lastPolled]#find time since last Polled
+        diffLastPolled = [abs(datetime.now() - lastPolledTime).total_seconds() for lastPolledTime in lastPolled]#find time since last Polled
         if max(diffLastPolled) > 10:
             return diffLastPolled.index(max(diffLastPolled))
         else: #all vms have been spawned recently. Pick the VM with least latency
