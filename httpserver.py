@@ -324,7 +324,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                 return vmListCycle.next()#do round robin
         if strategy == "waitedPolling":
             if found:
-                return vmList[s.getLeastCurrentLatency()]
+                return vmList[s.waitedPollingStrategy()]
         if not found:
             return -1
 
@@ -337,7 +337,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             lastPolled.append(value[1][-1])#get the last polled date from this VM
         #if VMs havent been polled for a minute, poll it once to update latency and see whats happennning
         diffLastPolled = [abs(datetime.Now - lastPolledTime).total_seconds() for lastPolledTime in lastPolled]#find time since last Polled
-        if max(diffLastPolled) > 30:
+        if max(diffLastPolled) > 10:
             return diffLastPolled.index(max(diffLastPolled))
         else: #all vms have been spawned recently. Pick the VM with least latency
             return lastLatencies.index(min(lastLatencies))
