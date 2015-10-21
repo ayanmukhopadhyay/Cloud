@@ -153,143 +153,144 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             s.send_response(400)
         print "Method is " + str(method)
         # check the local server list, whether it's empty
-        if not localVMs and method=="isNumberPrime":
-            print "local vm doesnt exist"
-            # create one by using nova_server_create's new method
-            #setup(primary = False, counter = vmCounter)
-            vm = bringVMFromPool(vmDomain,vmList)
-            print vm
-            if vm != None:
-                vmList.append(vm[0])
-                vmListCycle=cycle(vmList)
-                print "Local VM " + str(vm[1]) + " is created"
-            '''
-            #TODO: change the known_hosts file
-            # command = "ssh-keyscan -t rsa,dsa " + getLocalIPByServerName(vmName + str(vmCounter)) + " 2>&1 | sort -u - ~/.ssh/known_hosts > ~/.ssh/tmp_hosts"
-            # print "command to run: " + command
-            # process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
-            # output = process.communicate()[0]
-            # print "output: " + output
-            # command = "mv ~/.ssh/tmp_hosts ~/.ssh/known_hosts"
-            command = "ssh-keyscan " + getLocalIPByServerName(vmName + str(vmCounter)) + " >> ~/.ssh/known_hosts"
-            print "command to run: " + command
-            process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
-            output = process.communicate()[0]
-            print "output: " + output
-            '''
-            # copy the file checkPrime.py in the local VM
-            # set environment
-            # env.hosts = ["ubuntu@" + str(getLocalIPByServerName(vmName + str(vmCounter))),]
-            # print env.hosts
-            # while True:
-            #     if _is_host_up(env.hosts[0],22):
-            #         execute(copy)
-            #         break
-            # command = "ssh -i ayan_horizon.pem ubuntu@" + getLocalIPByServerName(vmName + str(vmCounter))
-            #command = "python copyCheckPrime.py " + getLocalIPByServerName(vmName + str(vmCounter))
-            #command = "python copyCheckPrime.py " + getLocalIPByServerName(vm[0])
-            command = "python copyCheckPrime.py " + str(vm[1])
-            print "command to run: " + command
-            process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
-            output = process.communicate()[0]
-            # from time import sleep
-            # while True:
-            #     print "output: " + str(output)
-            #     sleep(5)
-
-            # send the request to newly created local VM (also get the latency)
-            #isPrime, latency = send_req_to(vm[0], str(number),reqCounter)
-            #modified to send counter per server rather than total counter
-            print vm[0]
-            try:
-                isPrime, latency = send_req_to(vm[0], str(number),len(localVMs[vm[0]][0])+1)
-            except KeyError:
-                isPrime, latency = send_req_to(vm[0], str(number),1)
-
-            #vmList.append(vm[0])
-
-            #vmCounter += 1
-
-            # append the newly created VM's name and latency in the list
-            #localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
-            localVMs.update({vm[0]: [[latency], [datetime.now()]]})
-        else:
-            print "local vm exists"
-            #flag = False
-            machineToPing = s.getMachineToPing(loadBalancingStrategy)
-            print machineToPing
-            if machineToPing != -1:
-                #for localVM in localVMs:
-
-                    # search every VM which satisfies the criteria
-                    # i.e. check latency and last time stamp
-                    # satisfies_criteria = True
-                    # if (satisfies_criteria):
-                        # send the request to this VM
-                try:
-                    isPrime, latency = send_req_to(machineToPing, str(number), len(localVMs[machineToPing][0])+1)
-                except KeyError:
-                    isPrime, latency = send_req_to(machineToPing, str(number), 1)
-
-                # update the latency, timestamp
-                localVMs[machineToPing][0].append(latency)
-                localVMs[machineToPing][1].append(datetime.now())
-
-                        # localVM[1] = latency
-                        # localVM[2] = datetime.now()
-                        # set the flag saying we got the method
-                        # flag = True
-                        # break
-            else:#didnt find a good vm. must spawn another
-            # if there's no such machine
-            # if (not flag):
-                # do everything which is upper if() - create a new one and stuff
+        if method=="isNumberPrime":
+            if not localVMs:
+                print "local vm doesnt exist"
                 # create one by using nova_server_create's new method
-                #setup(primary = False, counter=vmCounter)
-                print "Domain is " + str(vmDomain)
-                print "List is " + str(vmList)
+                #setup(primary = False, counter = vmCounter)
                 vm = bringVMFromPool(vmDomain,vmList)
+                print vm
                 if vm != None:
                     vmList.append(vm[0])
-                    vmListCycle = cycle(vmList)
-                    print "Local VM " + str(vm[0]) + " is created"
-                    print "VM List is : " + str(vmList)
-                    #env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
-                    #execute(copy)
-                    try:
-                        isPrime, latency = send_req_to(vm[0], str(number), len(localVMs[vm[0]][0])+1)
-                    except KeyError:
-                        isPrime, latency = send_req_to(vm[0], str(number), 1)
-                    localVMs.update({vm[0]: [[latency], [datetime.now()]]})
-                else:
-                    #we wanted a new VM but we have exceeded capacity
-                    print localVMs[vm[0]][0]
-                    try:
-                        isPrime, latency = send_req_to(vmList[0], str(number), len(localVMs[vm[0]][0])+1)
-                    except KeyError:
-                        isPrime, latency = send_req_to(vmList[0], str(number), 1)
-                    localVMs.update({vm[0]: [[latency], [datetime.now()]]})
-
-
-
+                    vmListCycle=cycle(vmList)
+                    print "Local VM " + str(vm[1]) + " is created"
+                '''
+                #TODO: change the known_hosts file
+                # command = "ssh-keyscan -t rsa,dsa " + getLocalIPByServerName(vmName + str(vmCounter)) + " 2>&1 | sort -u - ~/.ssh/known_hosts > ~/.ssh/tmp_hosts"
+                # print "command to run: " + command
+                # process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
+                # output = process.communicate()[0]
+                # print "output: " + output
+                # command = "mv ~/.ssh/tmp_hosts ~/.ssh/known_hosts"
+                command = "ssh-keyscan " + getLocalIPByServerName(vmName + str(vmCounter)) + " >> ~/.ssh/known_hosts"
+                print "command to run: " + command
+                process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
+                output = process.communicate()[0]
+                print "output: " + output
                 '''
                 # copy the file checkPrime.py in the local VM
-                # get the ip address from vm name
-                env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
-
-                # copy the file by using fabric
-                execute(copy)
+                # set environment
+                # env.hosts = ["ubuntu@" + str(getLocalIPByServerName(vmName + str(vmCounter))),]
+                # print env.hosts
+                # while True:
+                #     if _is_host_up(env.hosts[0],22):
+                #         execute(copy)
+                #         break
+                # command = "ssh -i ayan_horizon.pem ubuntu@" + getLocalIPByServerName(vmName + str(vmCounter))
+                #command = "python copyCheckPrime.py " + getLocalIPByServerName(vmName + str(vmCounter))
+                #command = "python copyCheckPrime.py " + getLocalIPByServerName(vm[0])
+                command = "python copyCheckPrime.py " + str(vm[1])
+                print "command to run: " + command
+                process = subprocess.Popen(command.split(), stdout = subprocess.PIPE)
+                output = process.communicate()[0]
+                # from time import sleep
+                # while True:
+                #     print "output: " + str(output)
+                #     sleep(5)
 
                 # send the request to newly created local VM (also get the latency)
-                #isPrime, latency = send_req_to(vmName + str(vmCounter), number)
-                isPrime, latency = send_req_to(vm, number)
+                #isPrime, latency = send_req_to(vm[0], str(number),reqCounter)
+                #modified to send counter per server rather than total counter
+                print vm[0]
+                try:
+                    isPrime, latency = send_req_to(vm[0], str(number),len(localVMs[vm[0]][0])+1)
+                except KeyError:
+                    isPrime, latency = send_req_to(vm[0], str(number),1)
 
-                vmCounter += 1
+                #vmList.append(vm[0])
+
+                #vmCounter += 1
 
                 # append the newly created VM's name and latency in the list
-                localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
-                #localVMs.append([vmName + str(vmCounter), latency, datetime.now()])
-                '''
+                #localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
+                localVMs.update({vm[0]: [[latency], [datetime.now()]]})
+            else:
+                print "local vm exists"
+                #flag = False
+                machineToPing = s.getMachineToPing(loadBalancingStrategy)
+                print machineToPing
+                if machineToPing != -1:
+                    #for localVM in localVMs:
+
+                        # search every VM which satisfies the criteria
+                        # i.e. check latency and last time stamp
+                        # satisfies_criteria = True
+                        # if (satisfies_criteria):
+                            # send the request to this VM
+                    try:
+                        isPrime, latency = send_req_to(machineToPing, str(number), len(localVMs[machineToPing][0])+1)
+                    except KeyError:
+                        isPrime, latency = send_req_to(machineToPing, str(number), 1)
+
+                    # update the latency, timestamp
+                    localVMs[machineToPing][0].append(latency)
+                    localVMs[machineToPing][1].append(datetime.now())
+
+                            # localVM[1] = latency
+                            # localVM[2] = datetime.now()
+                            # set the flag saying we got the method
+                            # flag = True
+                            # break
+                else:#didnt find a good vm. must spawn another
+                # if there's no such machine
+                # if (not flag):
+                    # do everything which is upper if() - create a new one and stuff
+                    # create one by using nova_server_create's new method
+                    #setup(primary = False, counter=vmCounter)
+                    print "Domain is " + str(vmDomain)
+                    print "List is " + str(vmList)
+                    vm = bringVMFromPool(vmDomain,vmList)
+                    if vm != None:
+                        vmList.append(vm[0])
+                        vmListCycle = cycle(vmList)
+                        print "Local VM " + str(vm[0]) + " is created"
+                        print "VM List is : " + str(vmList)
+                        #env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
+                        #execute(copy)
+                        try:
+                            isPrime, latency = send_req_to(vm[0], str(number), len(localVMs[vm[0]][0])+1)
+                        except KeyError:
+                            isPrime, latency = send_req_to(vm[0], str(number), 1)
+                        localVMs.update({vm[0]: [[latency], [datetime.now()]]})
+                    else:
+                        #we wanted a new VM but we have exceeded capacity
+                        print localVMs[vm[0]][0]
+                        try:
+                            isPrime, latency = send_req_to(vmList[0], str(number), len(localVMs[vm[0]][0])+1)
+                        except KeyError:
+                            isPrime, latency = send_req_to(vmList[0], str(number), 1)
+                        localVMs.update({vm[0]: [[latency], [datetime.now()]]})
+
+
+
+                    '''
+                    # copy the file checkPrime.py in the local VM
+                    # get the ip address from vm name
+                    env.hosts = getLocalIPByServerName(vmName + str(vmCounter))
+
+                    # copy the file by using fabric
+                    execute(copy)
+
+                    # send the request to newly created local VM (also get the latency)
+                    #isPrime, latency = send_req_to(vmName + str(vmCounter), number)
+                    isPrime, latency = send_req_to(vm, number)
+
+                    vmCounter += 1
+
+                    # append the newly created VM's name and latency in the list
+                    localVMs.update({vmName + str(vmCounter): [[latency], [datetime.now()]]})
+                    #localVMs.append([vmName + str(vmCounter), latency, datetime.now()])
+                    '''
         if method=="isNumberPrime":
             s.send_response (200)
             s.send_header ("Content-type", "text/html")
