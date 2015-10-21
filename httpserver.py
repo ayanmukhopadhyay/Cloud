@@ -45,8 +45,8 @@ localVMs = {}
 vmList = []#stores only names
 vmListCycle = cycle(vmList)
 returnValue = None
-#loadBalancingStrategy = "roundRobin"
-loadBalancingStrategy = "waitedPolling"
+loadBalancingStrategy = "roundRobin"
+#loadBalancingStrategy = "waitedPolling"
 
 @task
 def copy():
