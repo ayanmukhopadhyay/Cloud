@@ -94,6 +94,13 @@ def send_req_to (vm, req, reqCounter):
     latency = (t2 - t1).total_seconds()
     return (output, latency)
 
+def changeStrategy():
+    global loadBalancingStrategy
+    if loadBalancingStrategy == "roundRobin":
+        loadBalancingStrategy = "waitedPolling"
+    else:
+        loadBalancingStrategy == "roundRobin"
+
 def plotLatency():
     latencies = []
     for key,value in localVMs.iteritems():
@@ -144,6 +151,9 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             pass
         elif method == "over":
             plotLatency()
+            s.send_response(400)
+        elif method == "changeStrategy":
+            changeStrategy()
             s.send_response(400)
         else:
             print "Error: Bad request"
