@@ -151,7 +151,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             print "Error: Bad request"
             s.send_response(400)
-
+        print "Method is " + str(method)
         # check the local server list, whether it's empty
         if not localVMs and method=="isNumberPrime":
             print "local vm doesnt exist"
