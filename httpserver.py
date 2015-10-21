@@ -16,9 +16,8 @@ import sys
 HOST = ''
 PORT = 8080
 vmName = 'ayan-ubuntu-test-vm'
-#vmCounter = 1234
 vmDomain = [["ayan-ubuntu-test-vm-worker-1","10.10.3.204"],["ayan-ubuntu-test-vm-worker-2","10.10.3.205"],["ayan-ubuntu-test-vm-worker-3","10.10.3.206"]]
-reqCounter=0#track number of requests to sleep
+reqCounter=0            #track number of requests to sleep
 
 def _is_host_up(host, port):
     # Set the timeout
@@ -30,9 +29,7 @@ def _is_host_up(host, port):
         transport = paramiko.Transport((host, port))
         host_status = True
     except:
-        print('***Warning*** Host {host} on port {port} is down.'.format(
-            host=host, port=port)
-        )
+        print('***Warning*** Host {host} on port {port} is down.'.format(host=host, port=port))
     socket.setdefaulttimeout(original_timeout)
     return host_status
 
@@ -45,8 +42,8 @@ localVMs = {}
 vmList = []#stores only names
 vmListCycle = cycle(vmList)
 returnValue = None
-loadBalancingStrategy = "roundRobin"
-#loadBalancingStrategy = "waitedPolling"
+#loadBalancingStrategy = "roundRobin"
+loadBalancingStrategy = "waitedPolling"
 
 @task
 def copy():
@@ -264,12 +261,12 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
                         localVMs.update({vm[0]: [[latency], [datetime.now()]]})
                     else:
                         #we wanted a new VM but we have exceeded capacity
-                        print localVMs[vm[0]][0]
+                        #print localVMs[vm[0]][0]
                         try:
-                            isPrime, latency = send_req_to(vmList[0], str(number), len(localVMs[vm[0]][0])+1)
+                            isPrime, latency = send_req_to(vmList[0], str(number), len(localVMs[vmList[0]][0])+1)
                         except KeyError:
                             isPrime, latency = send_req_to(vmList[0], str(number), 1)
-                        localVMs.update({vm[0]: [[latency], [datetime.now()]]})
+                        localVMs.update({vmList[0]: [[latency], [datetime.now()]]})
 
 
 
@@ -337,7 +334,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             lastPolled.append(value[1][-1])#get the last polled date from this VM
         #if VMs havent been polled for a minute, poll it once to update latency and see whats happennning
         diffLastPolled = [abs(datetime.now() - lastPolledTime).total_seconds() for lastPolledTime in lastPolled]#find time since last Polled
-        if max(diffLastPolled) > 10:
+        if max(diffLastPolled) > 20:
             return diffLastPolled.index(max(diffLastPolled))
         else: #all vms have been spawned recently. Pick the VM with least latency
             return lastLatencies.index(min(lastLatencies))
